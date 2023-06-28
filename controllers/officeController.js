@@ -74,7 +74,7 @@ const updateOfficePassword = async (req, res) => {
 
     await office.save();
 
-    res.status(StatusCodes.OK).json("Your office DOCUSEND password was successfully updated");
+    res.status(StatusCodes.OK).json("Your office's DOCUSEND password was successfully updated");
 }
 
 module.exports = {
