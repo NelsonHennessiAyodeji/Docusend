@@ -1,87 +1,102 @@
-const { NotFoundError, BadRequestError, UnauthenticatedError } = require("../errors");
-const Office = require("../models/Office");
+const {
+  NotFoundError,
+  BadRequestError,
+  UnauthenticatedError,
+} = require("../errors");
+const { Office } = require("../models/Office");
 const { StatusCodes } = require("http-status-codes");
 
 const getAnOffice = async (req, res) => {
-    const { id: officeId } = req.params;
-    const office = await Office.findOne({_id: officeId}).select('roomNumber officeHead department building');
+  const { id: officeId } = req.params;
+  const office = await Office.findOne({ _id: officeId }).select(
+    "roomNumber officeHead department building"
+  );
 
-    if(!office){
-        throw new NotFoundError(`There is no office with ID of ${officeId}`);
-    }
+  if (!office) {
+    throw new NotFoundError(`There is no office with ID of ${officeId}`);
+  }
 
-    res.status(StatusCodes.OK).json(office);
+  res.status(StatusCodes.OK).json(office);
 };
 
 const showCurrentOffice = async (req, res) => {
-    const { officeId, officeRoomNumber, officeDepartment, officeRole} = req.office;
-    res.status(StatusCodes.OK).json({officeId, officeRoomNumber, officeDepartment, officeRole});
+  const { officeId, officeRoomNumber, officeDepartment, officeRole } =
+    req.office;
+  res
+    .status(StatusCodes.OK)
+    .json({ officeId, officeRoomNumber, officeDepartment, officeRole });
 };
 
 const getAllOffice = async (req, res) => {
-    const offices = await Office.find({}).select('roomNumber officeHead department building');
-    res.status(StatusCodes.OK).json(offices);
+  const offices = await Office.find({}).select(
+    "roomNumber officeHead department building"
+  );
+  res.status(StatusCodes.OK).json(offices);
 };
 
 const updateOffice = async (req, res) => {
-    const { officeId } = req.office;
-    const { roomNumber, officeHead, department, building } = req.body;
-    const office = await Office.findOne({_id: officeId});
+  const { officeId } = req.office;
+  const { roomNumber, officeHead, department, building } = req.body;
+  const office = await Office.findOne({ _id: officeId });
 
-    if(!office){
-        throw new NotFoundError("Office does not exists");
-    }
+  if (!office) {
+    throw new NotFoundError("Office does not exists");
+  }
 
-    office.roomNumber = roomNumber;
-    office.officeHead = officeHead;
-    office.department = department;
-    office.building = building;
+  office.roomNumber = roomNumber;
+  office.officeHead = officeHead;
+  office.department = department;
+  office.building = building;
 
-    await office.save();
+  await office.save();
 
-    res.status(StatusCodes.OK).json({ roomNumber, officeHead, department, building });
+  res
+    .status(StatusCodes.OK)
+    .json({ roomNumber, officeHead, department, building });
 };
 
 const deleteOffice = async (req, res) => {
-    res.status(StatusCodes.OK).json("Delete office");
+  res.status(StatusCodes.OK).json("Delete office");
 };
 
 const updateOfficePassword = async (req, res) => {
-    const { officeId } = req.office;
-    const { oldPassword, newPassword } = req.body;
-    
-    if(!oldPassword || !newPassword){
-        throw new BadRequestError("Please provide a new and an old password");
-    }
+  const { officeId } = req.office;
+  const { oldPassword, newPassword } = req.body;
 
-    if(oldPassword === newPassword){
-        throw new BadRequestError("Your old and new password are matching");
-    }
+  if (!oldPassword || !newPassword) {
+    throw new BadRequestError("Please provide a new and an old password");
+  }
 
-    const office = await Office.findOne({_id: officeId});
+  if (oldPassword === newPassword) {
+    throw new BadRequestError("Your old and new password are matching");
+  }
 
-    if(!office){
-        throw new NotFoundError(`There is no office with ID of ${officeId}`);
-    }
+  const office = await Office.findOne({ _id: officeId });
 
-    const isPasswordCorrect = await office.comparePasswords(oldPassword);
+  if (!office) {
+    throw new NotFoundError(`There is no office with ID of ${officeId}`);
+  }
 
-    if(!isPasswordCorrect){
-        throw new UnauthenticatedError("Your old password is incorrect");
-    }
+  const isPasswordCorrect = await office.comparePasswords(oldPassword);
 
-    office.password = newPassword;
+  if (!isPasswordCorrect) {
+    throw new UnauthenticatedError("Your old password is incorrect");
+  }
 
-    await office.save();
+  office.password = newPassword;
 
-    res.status(StatusCodes.OK).json("Your office's DOCUSEND password was successfully updated");
-}
+  await office.save();
+
+  res
+    .status(StatusCodes.OK)
+    .json("Your office's DOCUSEND password was successfully updated");
+};
 
 module.exports = {
-    getAnOffice,
-    showCurrentOffice,
-    getAllOffice,
-    updateOffice,
-    deleteOffice,
-    updateOfficePassword
+  getAnOffice,
+  showCurrentOffice,
+  getAllOffice,
+  updateOffice,
+  deleteOffice,
+  updateOfficePassword,
 };

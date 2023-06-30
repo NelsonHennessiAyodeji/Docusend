@@ -7,24 +7,18 @@ const express = require("express");
 const server = express();
 const db = require("./database/connectDB");
 
-//File Upload And Download Imports
-const fileSystem = require("fs");
-const https = require("https");
-const path = require("path");
-
 //Other imports
 const cookieParser = require("cookie-parser");
-const fileUpload = require("multer");
-// const fileUpload = require("express-fileupload");
+// // const fileUpload = require("express-fileupload");
 
 //Router Imports
 const authRouter = require("./routers/authRouter");
 const officeRouter = require("./routers/officeRouter");
+const documentRouter = require("./routers/documentRouter");
 
 //Error-Handler Imports
 const notFound = require("./middleware/not-found");
 const errorHandler = require("./middleware/error-handler");
-const multer = require("multer");
 
 //Middleware
 server.use(express.json());
@@ -63,39 +57,12 @@ server.use(express.static("./public"));
 //   });
 // });
 
-const downloadFile = (url) => {
-  try {
-    const fileName = path.basename(url);
-    console.log(url);
-
-    const fileStream = fileSystem.createWriteStream(fileName);
-    // res.pipe(fileStream);
-
-    //Catch the finish event
-    fileStream.on("finish", () => {
-      fileStream.close();
-      console.log("Donwload completed successfully");
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-server.get("/download", (req, res) => {
-  try {
-    // console.log(req.params.id);
-    downloadFile("Something.txt");
-    res.json("Download seuccess");
-  } catch (error) {
-    console.error(error);
-  }
-});
-
 const port = process.env.PORT || 3000;
 
 //Server Routers
 server.use("/api/v1/auth", authRouter);
 server.use("/api/v1/offices", officeRouter);
+server.use("/api/v1/interactions", documentRouter);
 
 //Pseudo Home page
 server.get("/", (req, res) => {
