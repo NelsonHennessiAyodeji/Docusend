@@ -87,6 +87,7 @@ const PersonalInteractionSchema = mongoose.Schema(
       ref: "Interaction",
       required: true,
     },
+    trigger: Number,
   },
   { timestamps: true }
 );

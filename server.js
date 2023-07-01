@@ -26,37 +26,6 @@ server.use(cookieParser(process.env.JWT_SECRET));
 server.use(express.static("./public"));
 // server.use(fileUpload());
 
-// server.post("/upload", function (req, res) {
-//   // When a file has been uploaded
-//   if (req.files && Object.keys(req.files).length !== 0) {
-//     // Uploaded path
-//     const uploadedFile = req.files.uploadFile;
-
-//     // Logging uploading file
-//     console.log(uploadedFile);
-
-//     // Upload path
-//     const uploadPath = __dirname + "/uploads/" + uploadedFile.name;
-
-//     // To save the file using mv() function
-//     uploadedFile.mv(uploadPath, function (err) {
-//       if (err) {
-//         console.log(err);
-//         res.send("Failed !!");
-//       } else res.send("Successfully Uploaded !!");
-//     });
-//   } else res.send("No file uploaded !!");
-// });
-
-// server.get("/download", function (req, res) {
-//   // The res.download() talking file path to be downloaded
-//   res.download(__dirname + "/download_gfg.txt", function (err) {
-//     if (err) {
-//       console.log(err);
-//     }
-//   });
-// });
-
 const port = process.env.PORT || 3000;
 
 //Server Routers
@@ -82,7 +51,7 @@ const start = async () => {
       console.log(`Server listening on port ${port}...`);
     });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 

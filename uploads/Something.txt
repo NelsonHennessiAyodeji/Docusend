@@ -1,2 +1,24 @@
 uploads\Something.txt
 C:\Users\Khomeini N.S.E\Desktop\Node and express Project\docusend\uploads\Something.txt
+
+// server.post("/upload", function (req, res) {
+//   // When a file has been uploaded
+//   if (req.files && Object.keys(req.files).length !== 0) {
+//     // Uploaded path
+//     const uploadedFile = req.files.uploadFile;
+
+//     // Logging uploading file
+//     console.log(uploadedFile);
+
+//     // Upload path
+//     const uploadPath = __dirname + "/uploads/" + uploadedFile.name;
+
+//     // To save the file using mv() function
+//     uploadedFile.mv(uploadPath, function (err) {
+//       if (err) {
+//         console.log(err);
+//         res.send("Failed !!");
+//       } else res.send("Successfully Uploaded !!");
+//     });
+//   } else res.send("No file uploaded !!");
+// });

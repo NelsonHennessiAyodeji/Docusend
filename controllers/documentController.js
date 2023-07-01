@@ -6,15 +6,19 @@ const {
 const DocInfo = require("../models/DocInfo");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const { upload } = require("../utilities");
 
 const sendMessage = async (req, res) => {
-  const { id: receiverOfficeId } = req.params;
-  const { officeId: senderOfficeId } = req.office;
+  const { id: receivingOfficeId } = req.params;
+  const { officeId: sendingOfficeId } = req.office;
   const { downloadLink: documentDownloadLink } = req.body;
-  const sendingOffice = await Office.findOne({ _id: senderOfficeId });
-  const receivingOffice = await Office.findOne({ _id: receiverOfficeId });
+  const sendingOffice = await Office.findOne({ _id: sendingOfficeId });
+  const receivingOffice = await Office.findOne({ _id: receivingOfficeId });
+  let updateTrigger = Math.random() * 100;
 
-  if (receiverOfficeId === senderOfficeId) {
+  upload;
+
+  if (receivingOfficeId === sendingOfficeId) {
     throw new BadRequestError(
       "The sending office and receiving office are thesame"
     );
@@ -26,30 +30,32 @@ const sendMessage = async (req, res) => {
 
   let storedInteraction;
 
-  const hasInteracted = await Interaction.findOne({
-    office1: senderOfficeId,
-    office2: receiverOfficeId,
+  let hasInteracted = await Interaction.findOne({
+    office1: sendingOfficeId,
+    office2: receivingOfficeId,
   });
-  const hasInteractedInverse = await Interaction.findOne({
-    office1: receiverOfficeId,
-    office2: senderOfficeId,
+  let hasInteractedInverse = await Interaction.findOne({
+    office1: receivingOfficeId,
+    office2: sendingOfficeId,
   });
-  const isInteracted = hasInteracted || hasInteractedInverse;
+  let isInteracted = hasInteracted || hasInteractedInverse;
 
   if (!isInteracted) {
     const interaction = await Interaction.create({
-      office1: senderOfficeId,
-      office2: receiverOfficeId,
+      office1: sendingOfficeId,
+      office2: receivingOfficeId,
     });
     await PersonalInteraction.create({
-      thisOffice: senderOfficeId,
-      to: receiverOfficeId,
+      thisOffice: sendingOfficeId,
+      to: receivingOfficeId,
       interaction,
+      trigger: updateTrigger,
     });
     await PersonalInteraction.create({
-      thisOffice: receiverOfficeId,
-      to: senderOfficeId,
+      thisOffice: receivingOfficeId,
+      to: sendingOfficeId,
       interaction,
+      trigger: updateTrigger,
     });
     //TODO: To make this code beter, try getting this from the personalINteration elements on the office
     if (!interaction) {
@@ -65,11 +71,23 @@ const sendMessage = async (req, res) => {
     } else {
       storedInteraction = hasInteractedInverse._id;
     }
+    const sender = await PersonalInteraction.findOne({
+      thisOffice: sendingOfficeId,
+      to: receivingOfficeId,
+    });
+    sender.trigger = updateTrigger;
+    const reciever = await PersonalInteraction.findOne({
+      thisOffice: receivingOfficeId,
+      to: sendingOfficeId,
+    });
+    reciever.trigger = updateTrigger;
+    await sender.save();
+    await reciever.save();
   }
 
   const docInfo = await DocInfo.create({
-    from: senderOfficeId,
-    to: receiverOfficeId,
+    from: sendingOfficeId,
+    to: receivingOfficeId,
     downloadLink: documentDownloadLink,
     interaction: storedInteraction,
   });
@@ -96,9 +114,13 @@ const getAllMessage = async (req, res) => {
     }
     interaction = interactionInverse;
   }
-  const documents = await DocInfo.find({ interaction: interaction._id }).sort({
-    updatedAt: 1,
-  });
+  const documents = await DocInfo.find({ interaction: interaction._id })
+    .select("-interaction -createdAt -updatedAt")
+    .populate("from", "roomNumber")
+    .populate("to", "roomNumber")
+    .sort({
+      updatedAt: 1,
+    });
   res.status(StatusCodes.OK).json(documents);
 };
 
@@ -106,10 +128,21 @@ const getAllInteractions = async (req, res) => {
   const personalInteractions = await PersonalInteraction.find({
     thisOffice: req.office.officeId,
   })
-    .populate("to")
+    .select("-thisOffice -interaction -createdAt ")
+    .populate("to", "roomNumber ")
     .sort({ updatedAt: -1 });
   res.status(StatusCodes.OK).json(personalInteractions);
 };
+
+// .populate('user', 'name email')
+//     .populate({
+//         path: 'orderItems',
+//         populate: {
+//             path: 'product',
+//             populate: 'category'
+//         }
+//     })
+//     .sort({'dateOrdered': -1});
 
 module.exports = {
   sendMessage,
