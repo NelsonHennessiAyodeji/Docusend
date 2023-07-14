@@ -16,22 +16,33 @@
       <img src="images/NPA_Logo.jpg" alt="" />
       <span id="title"> Nigerian Ports Authority Docusend App</span>
       <div class="btn">
-        <span class="head_btn">
-          <a href=""><i class="fa fa-search"></i> </a>
-        </span>
-        <span class="head_btn">
-          <a href=""><i class="fa fa-sign-out"></i> </a>
-        </span>
       </div>
     </header>
     <main id="signup_main">
       <form action="POST">
         <p id="s_up">Sign Up</p>
-        <label for="Office">Office:<input type="text" name="" id="" placeholder="      Enter office designation e.g  HQ/ICT/GM"/></label>
-        <label for="Password"> Password:<input type="password" name="" id="" /></label>
-        <label for="Password">Confirm Password:<input type="password" name="" id="" /></label>
-        <button type="submit"> Submit</button>
-         <span>Already signed up <i><a href="index.html">login</a></i></span>
+        <label for="Office"
+          >Office:<select name="" id="">
+            <option value="ICT">ICT</option>
+          </select>
+        </label>
+        <label for="Designation">
+          Designation:
+          <select name="Designation" id="">
+            <option value="GM">GM</option>
+            <option value="AGM">AGM</option>
+          </select>
+        </label>
+        <label for="Password">
+          Password:<input type="password" name="" id=""
+        /></label>
+        <label for="Password"
+          >Confirm Password:<input type="password" name="" id=""
+        /></label>
+        <button type="submit">Submit</button>
+        <span
+          >Already signed up <i><a href="index.html">login</a></i></span
+        >
       </form>
     </main>
   </body>

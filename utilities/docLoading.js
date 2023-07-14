@@ -5,7 +5,7 @@ const upload = () => {
     const uploadPath = __dirname + "/uploads/" + uploadedFile.name;
     uploadedFile.mv(uploadPath, function (err) {
       if (err) {
-        console.log(err);
+        console.log(err);z
         res.send("Failed !!");
       } else res.send("Successfully Uploaded !!");
     });

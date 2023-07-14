@@ -24,6 +24,7 @@ header img{
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    width: 10vw;
 }
 .btn a i{
     font-size: 30px;
@@ -118,10 +119,11 @@ button:hover{
     color: #41644A;
     align-items: center;
 }
-#signup_main form label input{
+#signup_main form label input, #signup_main form label select{
     height: 90%;
     width: 70%;
     border: 1px solid #41644A;
+    text-align: center;
 }
 #signup_main form p{
     color: #41644A;
@@ -135,4 +137,7 @@ button:hover{
     padding: 5px;
     margin-left: auto;
     margin-right: auto;
+}
+option{
+    font-size:medium;
 }
