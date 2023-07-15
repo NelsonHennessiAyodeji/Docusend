@@ -3,12 +3,12 @@ const { attachCookiesToResponse } = require("../utilities");
 const {
   BadRequestError,
   NotFoundError,
-  UnauthenticatedError,
+  UnauthenticatedError
 } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 
 const register = async (req, res) => {
-  const { roomNumber, building, department, officeHead } = req.body;
+  const { unit, designation, department, email } = req.body;
   const isFirstAccount = (await Office.find({})).length === 0;
   const role = isFirstAccount ? "admin" : "user";
 
@@ -21,34 +21,30 @@ const register = async (req, res) => {
   }
 
   const officePayload = {
-    officeRoomNumber: roomNumber,
-    officeBuilding: building,
+    officeUnit: unit,
+    officeDesignation: designation,
     officeDepartment: department,
-    officeHead: officeHead,
+    email: email,
     officeRole: role,
-    officeId: office._id,
+    officeId: office._id
   };
 
   attachCookiesToResponse(res, officePayload);
-  res
-    .status(StatusCodes.CREATED)
-    .json({ roomNumber, department, building, role });
+  res.status(StatusCodes.CREATED).json({ unit, department, designation, role });
 };
 
 const login = async (req, res) => {
-  const { roomNumber, department, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!roomNumber || !department || !password) {
+  if (!email || !password) {
     throw new BadRequestError(
-      "Please provide the roomNumber, department and the office's password to login"
+      "Please provide the office's email and password to login"
     );
   }
-  const office = await Office.findOne({ roomNumber });
+  const office = await Office.findOne({ email });
 
   if (!office) {
-    throw new NotFoundError(
-      "The office with this room number or department does not exists"
-    );
+    throw new NotFoundError("The office does not exists");
   }
 
   const passwordIsCorrect = await office.comparePasswords(password);
@@ -58,29 +54,27 @@ const login = async (req, res) => {
   }
 
   const officePayload = {
-    officeRoomNumber: office.roomNumber,
-    officeBuilding: office.building,
+    officeUnit: office.unit,
+    officeDesignation: office.designation,
     officeDepartment: office.department,
-    officeHead: office.officeHead,
+    email: office.email,
     officeRole: office.role,
-    officeId: office._id,
+    officeId: office._id
   };
 
   attachCookiesToResponse(res, officePayload);
-  res
-    .status(StatusCodes.OK)
-    .json({
-      roomNumber: office.roomNumber,
-      department: office.department,
-      building: office.building,
-      role: office.role,
-    });
+  res.status(StatusCodes.OK).json({
+    unit: office.unit,
+    department: office.department,
+    designation: office.designation,
+    role: office.role
+  });
 };
 
 const logout = async (req, res) => {
   res.cookie("officeToken", "logout", {
     httpOnly: true,
-    expires: new Date(Date.now()),
+    expires: new Date(Date.now())
   });
   res.status(StatusCodes.OK).json("Successfully Logged out");
 };
@@ -88,5 +82,5 @@ const logout = async (req, res) => {
 module.exports = {
   register,
   login,
-  logout,
+  logout
 };

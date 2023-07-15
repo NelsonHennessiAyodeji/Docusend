@@ -9,7 +9,8 @@ const db = require("./database/connectDB");
 
 //Other imports
 const cookieParser = require("cookie-parser");
-// // const fileUpload = require("express-fileupload");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 //Router Imports
 const authRouter = require("./routers/authRouter");
@@ -39,6 +40,18 @@ server.get("/", (req, res) => {
     .status(200)
     .json({ HomePage: "Docusend Homepage", cookie: req.signedCookies });
 });
+
+server.post("/upload_files", upload.array("file"), uploadFiles);
+
+function uploadFiles(req, res) {
+  console.log(req.files);
+  console.log(req.file);
+  res.json({
+    message: "Successfully uploaded files",
+    reqBody: req.body,
+    reqFiles: req.file
+  });
+}
 
 //Error-Handlers
 server.use(notFound);

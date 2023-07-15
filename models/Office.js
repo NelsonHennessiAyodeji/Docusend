@@ -2,48 +2,44 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const OfficeSchema = mongoose.Schema({
-  roomNumber: {
+  email: {
     type: String,
-    required: [true, "Please indicate your office number"],
-    unique: true,
+    required: [true, "Please provide an email"],
+    unique: true
   },
-  officeHead: {
+  unit: {
+    type: String,
+    required: [true, "Please indicate your office's unit"]
+  },
+  designation: {
     type: String,
     required: [true, "Please indicate your office"],
     enum: {
       values: ["GM", "AGM"],
-      message: "{VALUE} is not recognised in this organisation",
-    },
+      message: "{VALUE} is not recognised in this organisation"
+    }
   },
   department: {
     type: String,
     required: [true, "Please indicate your department"],
     enum: {
       values: ["ICT", "Security", "Electrical", "Training"],
-      message: "{VALUE} is not recognised in this organisation",
-    },
-  },
-  building: {
-    type: String,
-    required: [true, "Please indicate the building your office is in"],
-    enum: {
-      values: ["HQ", "annex"],
-      message: "{VALUE} is not recognised in this organisation",
-    },
+      message: "{VALUE} is not recognised in this organisation"
+    }
   },
   interactions: {
     type: [mongoose.Types.ObjectId],
     ref: "Interaction",
-    required: true,
+    required: true
   },
   password: {
     type: String,
-    required: [true, "Please provide a password to proceed"],
+    required: [true, "Please provide a password to proceed"]
   },
   role: {
     type: String,
-    enum: ["admin", "user"],
-  },
+    enum: ["admin", "user"]
+  }
 });
 
 OfficeSchema.pre("save", async function () {
@@ -61,13 +57,13 @@ const InteractionSchema = mongoose.Schema({
   office1: {
     type: mongoose.Types.ObjectId,
     ref: "Office",
-    required: true,
+    required: true
   },
   office2: {
     type: mongoose.Types.ObjectId,
     ref: "Office",
-    required: true,
-  },
+    required: true
+  }
 });
 
 const PersonalInteractionSchema = mongoose.Schema(
@@ -75,19 +71,19 @@ const PersonalInteractionSchema = mongoose.Schema(
     thisOffice: {
       type: mongoose.Types.ObjectId,
       ref: "Office",
-      required: true,
+      required: true
     },
     to: {
       type: mongoose.Types.ObjectId,
       ref: "Office",
-      required: true,
+      required: true
     },
     interaction: {
       type: [mongoose.Types.ObjectId],
       ref: "Interaction",
-      required: true,
+      required: true
     },
-    trigger: Number,
+    trigger: Number
   },
   { timestamps: true }
 );

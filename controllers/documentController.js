@@ -1,7 +1,7 @@
 const {
   Office,
   Interaction,
-  PersonalInteraction,
+  PersonalInteraction
 } = require("../models/Office");
 const DocInfo = require("../models/DocInfo");
 const { BadRequestError } = require("../errors");
@@ -16,7 +16,7 @@ const sendMessage = async (req, res) => {
   const receivingOffice = await Office.findOne({ _id: receivingOfficeId });
   let updateTrigger = Math.random() * 100;
 
-  upload;
+  // upload();
 
   if (receivingOfficeId === sendingOfficeId) {
     throw new BadRequestError(
@@ -32,30 +32,30 @@ const sendMessage = async (req, res) => {
 
   let hasInteracted = await Interaction.findOne({
     office1: sendingOfficeId,
-    office2: receivingOfficeId,
+    office2: receivingOfficeId
   });
   let hasInteractedInverse = await Interaction.findOne({
     office1: receivingOfficeId,
-    office2: sendingOfficeId,
+    office2: sendingOfficeId
   });
   let isInteracted = hasInteracted || hasInteractedInverse;
 
   if (!isInteracted) {
     const interaction = await Interaction.create({
       office1: sendingOfficeId,
-      office2: receivingOfficeId,
+      office2: receivingOfficeId
     });
     await PersonalInteraction.create({
       thisOffice: sendingOfficeId,
       to: receivingOfficeId,
       interaction,
-      trigger: updateTrigger,
+      trigger: updateTrigger
     });
     await PersonalInteraction.create({
       thisOffice: receivingOfficeId,
       to: sendingOfficeId,
       interaction,
-      trigger: updateTrigger,
+      trigger: updateTrigger
     });
     //TODO: To make this code beter, try getting this from the personalINteration elements on the office
     if (!interaction) {
@@ -73,12 +73,12 @@ const sendMessage = async (req, res) => {
     }
     const sender = await PersonalInteraction.findOne({
       thisOffice: sendingOfficeId,
-      to: receivingOfficeId,
+      to: receivingOfficeId
     });
     sender.trigger = updateTrigger;
     const reciever = await PersonalInteraction.findOne({
       thisOffice: receivingOfficeId,
-      to: sendingOfficeId,
+      to: sendingOfficeId
     });
     reciever.trigger = updateTrigger;
     await sender.save();
@@ -89,7 +89,7 @@ const sendMessage = async (req, res) => {
     from: sendingOfficeId,
     to: receivingOfficeId,
     downloadLink: documentDownloadLink,
-    interaction: storedInteraction,
+    interaction: storedInteraction
   });
 
   res.status(StatusCodes.CREATED).json(docInfo);
@@ -100,12 +100,12 @@ const getAllMessage = async (req, res) => {
   const { id: receivingOfficeId } = req.params;
   let interaction = await Interaction.findOne({
     office1: sendingOfficeId,
-    office2: receivingOfficeId,
+    office2: receivingOfficeId
   });
   if (!interaction) {
     const interactionInverse = await Interaction.findOne({
       office1: receivingOfficeId,
-      office2: sendingOfficeId,
+      office2: sendingOfficeId
     });
     if (!interactionInverse) {
       return res
@@ -116,20 +116,20 @@ const getAllMessage = async (req, res) => {
   }
   const documents = await DocInfo.find({ interaction: interaction._id })
     .select("-interaction -createdAt -updatedAt")
-    .populate("from", "roomNumber")
-    .populate("to", "roomNumber")
+    .populate("from")
+    .populate("to")
     .sort({
-      updatedAt: 1,
+      updatedAt: 1
     });
   res.status(StatusCodes.OK).json(documents);
 };
 
 const getAllInteractions = async (req, res) => {
   const personalInteractions = await PersonalInteraction.find({
-    thisOffice: req.office.officeId,
+    thisOffice: req.office.officeId
   })
     .select("-thisOffice -interaction -createdAt ")
-    .populate("to", "roomNumber ")
+    .populate("to")
     .sort({ updatedAt: -1 });
   res.status(StatusCodes.OK).json(personalInteractions);
 };
@@ -147,5 +147,5 @@ const getAllInteractions = async (req, res) => {
 module.exports = {
   sendMessage,
   getAllMessage,
-  getAllInteractions,
+  getAllInteractions
 };
